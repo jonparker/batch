@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >-
+  batch processing from S3 event
+Transform:
+  - AWS::Serverless-2016-10-31
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: dist/
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Timeout: 30
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+              Resource: arn:aws:s3:::batch-process-bucket2/*
+            - Effect: Allow
+              Action:
+                - lambda:GetFunctionConcurrency
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - cloudwatch:GetMetricStatistics
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - secretsmanager:GetSecretValue
+              Resource: "arn:aws:secretsmanager:*:*:secret:api-key*"
+      Events:
+        MyBucketEvent:
+          Type: S3
+          Properties:
+            Bucket: batch-process-bucket2
+            Events: s3:ObjectCreated:*

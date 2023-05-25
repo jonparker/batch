@@ -1,0 +1,33 @@
+Resources:
+  MyFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: s3://batch-process-sam-template2/11ac9032c7c7c9e3ca3e295484194d13
+      Handler: index.handler
+      Runtime: nodejs18.x
+      Timeout: 30
+      Policies:
+      - Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Action:
+          - s3:GetObject
+          Resource: arn:aws:s3:::batch-process-bucket2/*
+        - Effect: Allow
+          Action:
+          - lambda:GetFunctionConcurrency
+          Resource: '*'
+        - Effect: Allow
+          Action:
+          - cloudwatch:GetMetricStatistics
+          Resource: '*'
+        - Effect: Allow
+          Action:
+          - secretsmanager:GetSecretValue
+          Resource: arn:aws:secretsmanager:*:*:secret:api-key*
+      Events:
+        MyBucketEvent:
+          Type: S3
+          Properties:
+            Bucket: batch-process-bucket2
+            Events: s3:ObjectCreated:*
